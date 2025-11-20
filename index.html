@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Nikmin Siege DX Director's Cut: Battle</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>🏠</text></svg>">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="game-wrapper">
+    <!-- Main Menu Overlay (starts visible) -->
+    <section id="main-menu" class="overlay visible">
+      <div class="menu-panel">
+        <div class="menu-logo">
+          <h1>NIKMIN SIEGE DX</h1>
+          <p class="menu-subtitle">Director's Cut: Battle</p>
+        </div>
+        <div class="menu-actions">
+          <button id="play-btn" class="menu-btn primary">PRESS START</button>
+          <button id="help-btn" class="menu-btn">HOW TO PLAY</button>
+          <p class="menu-hint">Deploy Nikmin • Defend • Survive</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- How to Play Overlay -->
+    <section id="help-menu" class="overlay">
+      <div class="menu-panel" style="max-width: 600px; max-height: 80vh; overflow-y: auto;">
+        <h2 style="text-align: center; margin-bottom: 20px;">HOW TO PLAY</h2>
+
+        <div style="text-align: left; padding: 0 20px;">
+          <h3 style="color: var(--accent-gold); margin-top: 15px;">🎮 Controls</h3>
+          <p>• <strong>Click grid</strong> to place towers (avoid glowing path)</p>
+          <p>• <strong>Right-click</strong> to cancel selection</p>
+          <p>• <strong>Space</strong> to start wave</p>
+          <p>• <strong>ESC</strong> to pause/resume</p>
+
+          <h3 style="color: var(--accent-gold); margin-top: 15px;">🗼 Tower Types</h3>
+          <p>• <strong>🔺 Pulse (50)</strong> - Fast firing, low damage</p>
+          <p>• <strong>🟦 Beam (100)</strong> - Balanced damage and speed</p>
+          <p>• <strong>🔮 Nova (150)</strong> - Slow, devastating AOE</p>
+          <p>• <strong>🏠 Nikmin (125)</strong> - Deploys colored minions</p>
+          <p>• <strong>✚ Heal (100)</strong> - Restores core HP (L3+ shields Nikmin)</p>
+
+          <h3 style="color: var(--accent-gold); margin-top: 15px;">🏠 Nikmin Minions</h3>
+          <p>• <strong>🔴 Red</strong> - Fast speed, low damage</p>
+          <p>• <strong>🔵 Blue</strong> - Balanced speed and damage</p>
+          <p>• <strong>🟡 Yellow</strong> - Slow speed, high damage</p>
+          <p style="font-size: 13px; color: var(--accent-green);">Minions hunt enemies autonomously. Die in 1 hit but respawn!</p>
+
+          <h3 style="color: var(--accent-gold); margin-top: 15px;">⚡ Special Abilities</h3>
+          <p>• <strong>⚡ EMP (100)</strong> - Damages ALL enemies</p>
+          <p>• <strong>❄️ Freeze (150)</strong> - Slows all enemies 3s</p>
+
+          <h3 style="color: var(--accent-gold); margin-top: 15px;">💡 Strategy Tips</h3>
+          <p>• Start with 2-3 Pulse towers + 1 Nikmin</p>
+          <p>• Upgrade towers to level 4 for maximum power</p>
+          <p>• Nikmin towers gain +2 minions per upgrade (max 12!)</p>
+          <p>• Save abilities for boss waves (every 10 waves)</p>
+        </div>
+
+        <div class="menu-actions" style="margin-top: 20px;">
+          <button id="close-help-btn" class="menu-btn primary">GOT IT!</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Game Over Overlay -->
+    <section id="game-over" class="overlay">
+      <div class="menu-panel">
+        <h2 class="gameover-title">GAME OVER</h2>
+        <div class="gameover-stats">
+          <div class="stat-item">
+            <span class="stat-label">Wave Reached</span>
+            <span class="stat-value large" id="final-wave">0</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Final Score</span>
+            <span class="stat-value large" id="final-score">0</span>
+          </div>
+        </div>
+        <div class="menu-actions">
+          <button id="restart-btn" class="menu-btn primary">TRY AGAIN</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Main Game Container -->
+    <div id="app">
+      <!-- Top HUD -->
+      <header class="hud">
+        <div class="hud-left">
+          <div class="hud-title">
+            <h1>NIKMIN SIEGE DX</h1>
+            <p class="hud-subtitle">Director's Cut</p>
+          </div>
+        </div>
+
+        <div class="hud-center">
+          <!-- Resources -->
+          <div class="resource-bar">
+            <div class="chip" data-type="credits">
+              <span class="chip-icon">🪙</span>
+              <div class="chip-info">
+                <span class="chip-label">CREDITS</span>
+                <span class="chip-value">250</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Health Bar -->
+          <div class="health-bar">
+            <div class="health-label">CORE HEALTH</div>
+            <div class="health-container">
+              <div class="hp-fill" style="width: 100%"></div>
+              <span class="health-text"><span class="stat-value" id="health-value">100</span>/100</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="hud-right">
+          <!-- Stats -->
+          <div class="stats-grid">
+            <div class="stat-box">
+              <span class="stat-label">WAVE</span>
+              <span class="stat-value" id="wave-value">0</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-label">SCORE</span>
+              <span class="stat-value" id="score-value">0</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-label">ENEMIES</span>
+              <span class="stat-value" id="enemies-value">0</span>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Game Area -->
+      <main class="game-container">
+        <!-- Tower Selection Panel -->
+        <aside class="tower-panel">
+          <h3 class="panel-title">► TOWERS ◄</h3>
+          <div class="tower-grid">
+            <button class="tower-btn" data-tower="pulse">
+              <div class="tower-icon pulse-icon"></div>
+              <div class="tower-info">
+                <span class="tower-name">PULSE</span>
+                <span class="tower-cost">🪙 <span>50</span></span>
+              </div>
+            </button>
+            <button class="tower-btn" data-tower="beam">
+              <div class="tower-icon beam-icon"></div>
+              <div class="tower-info">
+                <span class="tower-name">BEAM</span>
+                <span class="tower-cost">🪙 <span>100</span></span>
+              </div>
+            </button>
+            <button class="tower-btn" data-tower="nova">
+              <div class="tower-icon nova-icon"></div>
+              <div class="tower-info">
+                <span class="tower-name">NOVA</span>
+                <span class="tower-cost">🪙 <span>150</span></span>
+              </div>
+            </button>
+            <button class="tower-btn" data-tower="nikmin">
+              <div class="tower-icon nikmin-icon"></div>
+              <div class="tower-info">
+                <span class="tower-name">NIKMIN</span>
+                <span class="tower-cost">🪙 <span>125</span></span>
+              </div>
+            </button>
+            <button class="tower-btn" data-tower="heal">
+              <div class="tower-icon heal-icon"></div>
+              <div class="tower-info">
+                <span class="tower-name">HEAL</span>
+                <span class="tower-cost">🪙 <span>100</span></span>
+              </div>
+            </button>
+          </div>
+
+          <h3 class="panel-title" style="margin-top: 15px;">► POWERS ◄</h3>
+          <div class="ability-grid">
+            <button id="ability-emp" class="ability-btn">
+              <span class="ability-icon">⚡</span>
+              <span class="ability-name">EMP (100)</span>
+            </button>
+            <button id="ability-freeze" class="ability-btn">
+              <span class="ability-icon">❄️</span>
+              <span class="ability-name">FREEZE (150)</span>
+            </button>
+          </div>
+        </aside>
+
+        <!-- Canvas -->
+        <div class="canvas-container">
+          <canvas id="game-canvas" width="960" height="540"></canvas>
+        </div>
+
+        <!-- Control Panel -->
+        <aside class="control-panel">
+          <h3 class="panel-title">► CONTROL ◄</h3>
+          <div class="control-grid">
+            <button id="start-wave" class="control-btn primary">
+              <span class="btn-icon">▶</span>
+              <span>START WAVE</span>
+            </button>
+            <button id="fast-forward" class="control-btn">
+              <span class="btn-icon">⏩</span>
+              <span>SPEED (1x)</span>
+            </button>
+            <button id="pause" class="control-btn">
+              <span class="btn-icon">⏸</span>
+              <span>PAUSE</span>
+            </button>
+          </div>
+
+          <!-- Notification Feed -->
+          <div class="notification-feed">
+            <h4 class="feed-title">ACTIVITY FEED</h4>
+            <div id="feed-messages" class="feed-messages">
+              <!-- Messages will appear here dynamically -->
+            </div>
+            <button id="feed-history-btn" class="feed-history-btn">📜 HISTORY</button>
+          </div>
+        </aside>
+      </main>
+
+      <!-- Tower Upgrade Panel (Hidden by default) -->
+      <div id="upgrade-panel" class="upgrade-panel">
+        <div class="upgrade-header">
+          <h3 id="tower-name">TOWER</h3>
+          <button id="close-upgrade-btn" class="close-btn">×</button>
+        </div>
+        <div id="tower-stats" class="tower-stats"></div>
+        <div class="upgrade-actions">
+          <button id="upgrade-btn" class="upgrade-btn">UPGRADE</button>
+          <button id="sell-btn" class="sell-btn">SELL</button>
+        </div>
+      </div>
+
+      <!-- Feed History Panel -->
+      <div id="feed-history-panel" class="feed-history-panel">
+        <div class="history-header">
+          <h3>FEED HISTORY</h3>
+          <button id="close-history-btn" class="close-btn">×</button>
+        </div>
+        <div id="history-messages" class="history-messages">
+          <!-- All past messages will appear here -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>
